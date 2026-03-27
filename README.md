@@ -6,27 +6,73 @@ Application web Next.js pour invoquer des personnages avec un système de gacha.
 
 - **Invocation x1** : Invoquez un personnage aléatoire
 - **Invocation x10** : Invoquez 10 personnages d'un coup
-- **Système de rareté** :
-  - ⚪ Commun (60%)
-  - 🔵 Rare (30%)
-  - 🟣 Épique (9%)
-  - 🟡 Légendaire (1%)
+- **Système de rareté à 6 niveaux (SÉVÈRE)** :
+  - ⚪ C - Common (70%)
+  - 🟢 R - Rare (20%)
+  - 🔵 SR - Super Rare (7%)
+  - 🟣 SSR - Super Super Rare (2%)
+  - 🟡 UR - Ultra Rare (0.8%)
+  - 🔴 LR - Legendary Rare (0.2%)
 - **Animations** : Effets visuels lors des invocations
-- **Statistiques** : Suivi du nombre d'invocations
+- **Statistiques détaillées** : Suivi du nombre d'invocations par rareté
+- **Historique MongoDB** : Sauvegarde automatique de toutes vos invocations
+  - Identification par IP (sans authentification)
+  - Statistiques globales (total d'invocations, sessions, raretés obtenues)
+  - Affichage complet de l'historique avec toutes les cartes
 
 ## 🚀 Installation
 
-1. Installer les dépendances :
+1. Créer un fichier `.env.local` à la racine avec votre URI MongoDB :
+```
+MONGODB_URI=mongodb+srv://user:password@cluster.mongodb.net/it8_card
+```
+
+2. Installer les dépendances :
 ```bash
 npm install
 ```
 
-2. Lancer le serveur de développement :
+3. Lancer le serveur de développement :
 ```bash
 npm run dev
 ```
 
-3. Ouvrir [http://localhost:3000](http://localhost:3000) dans votre navigateur
+4. Ouvrir [http://localhost:3000](http://localhost:3000) dans votre navigateur
+
+## 🗄️ Capi/
+│   │   └── history/
+│   │       ├── get/route.ts    # API pour récupérer l'historique
+│   │       └── save/route.ts   # API pour sauvegarder l'historique
+│   ├── globals.css       # Styles globaux
+│   ├── layout.tsx        # Layout principal
+│   ├── page.tsx          # Page d'accueil avec système d'invocation
+│   └── page.module.css   # Styles de la page
+├── lib/
+│   ├── mongodb.ts        # Configuration MongoDB
+│   └── getClientIp.ts    # Utilitaire pour obtenir l'IP client
+├── public/
+│   └── cards/            # Images des personnages
+├── .env.local            # Variables d'environnement (MongoDB URI)
+- **Identification** : Par IP de l'utilisateur (pas de système de connexion requis)
+
+### Structure des documents
+
+```typescript
+{
+  _id: ObjectId,
+  userIp: string,           // IP de l'utilisateur
+  characters: Character[],  // Liste des personnages obtenus
+  pullCount: number,        // Nombre d'invocations (1 ou 10)
+  timestamp: Date          // Date et heure de l'invocation
+}
+```
+
+### Note sur l'identification par IP
+
+- ✅ Pas besoin d'authentification utilisateur
+- ✅ Historique persistant entre les sessions
+- ⚠️ Les utilisateurs derrière le même réseau partagent l'historique
+- ⚠️ L'IP peut changer selon le FAI
 
 ## 📁 Structure
 
@@ -63,10 +109,12 @@ Ajustez les valeurs dans `rarityChances` dans `app/page.tsx` :
 
 ```typescript
 const rarityChances = {
-  common: 0.60,    // 60%
-  rare: 0.30,      // 30%
-  epic: 0.09,      // 9%
-  legendary: 0.01  // 1%
+  C: 0.70,     // 70%
+  R: 0.20,     // 20%
+  SR: 0.07,    // 7%
+  SSR: 0.02,   // 2%
+  UR: 0.008,   // 0.8%
+  LR: 0.002    // 0.2%
 }
 ```
 

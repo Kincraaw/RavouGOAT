@@ -11,14 +11,17 @@ Placez vos images de cartes dans ce dossier.
 
 ## Liste des cartes par défaut
 
-L'application recherche ces images :
-- warrior.png (Commun)
-- mage.png (Commun)
-- archer.png (Rare)
-- paladin.png (Rare)
-- assassin.png (Épique)
-- druid.png (Épique)
-- dragon.png (Légendaire)
-- phoenix.png (Légendaire)
+L'application recherche ces images avec leurs raretés :
+- warrior.png (C - Common)
+- mage.png (C - Common)
+- archer.png (R - Rare)
+- paladin.png (R - Rare)
+- thief.png (R - Rare)
+- dark-knight.png (SR - Super Rare)
+- druid.png (SR - Super Rare)
+- assassin.png (SSR - Super Super Rare)
+- sage.png (SSR - Super Super Rare)
+- dragon.png (UR - Ultra Rare)
+- phoenix.png (LR - Legendary Rare)
 
 **Note** : Si les images n'existent pas, des placeholders seront affichés automatiquement.

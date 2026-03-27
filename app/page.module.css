@@ -29,8 +29,8 @@
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
   margin-bottom: 3rem;
 }
 
@@ -189,6 +189,16 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
+/* Effet spécial pour les raretés élevées */
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 20px currentColor, 0 20px 40px rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px currentColor, 0 20px 40px rgba(0, 0, 0, 0.3);
+  }
+}
+
 .cardImage {
   width: 100%;
   aspect-ratio: 2/3;
@@ -217,10 +227,11 @@
 }
 
 .cardRarity {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
+  line-height: 1.4;
 }
 
 .clearButton {
@@ -273,6 +284,159 @@
   font-size: 1.1rem;
 }
 
+/* History Section */
+.historySection {
+  margin-top: 4rem;
+}
+
+.historyButton {
+  display: block;
+  margin: 0 auto 2rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border: none;
+  border-radius: 0.75rem;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.historyButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.historyContainer {
+  background: rgba(30, 41, 59, 0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 2rem;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.historyLoading,
+.historyEmpty {
+  text-align: center;
+  padding: 3rem;
+  color: #94a3b8;
+  font-size: 1.1rem;
+}
+
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.historyList::-webkit-scrollbar {
+  width: 8px;
+}
+
+.historyList::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.4);
+  border-radius: 4px;
+}
+
+.historyList::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.5);
+  border-radius: 4px;
+}
+
+.historyList::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.7);
+}
+
+.historyItem {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.historyItem:hover {
+  background: rgba(15, 23, 42, 0.8);
+  border-color: rgba(99, 102, 241, 0.3);
+  transform: translateX(5px);
+}
+
+.historyHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.historyDate {
+  color: #94a3b8;
+  font-size: 0.95rem;
+}
+
+.historyCount {
+  color: #fbbf24;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.historyCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 0.75rem;
+}
+
+.historyCard {
+  background: rgba(30, 41, 59, 0.6);
+  border: 2px solid;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.historyCard:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.historyCard img {
+  width: 100%;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+  display: block;
+}
+
+.historyCardName {
+  display: block;
+  padding: 0.4rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: #f1f5f9;
+  background: rgba(15, 23, 42, 0.8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 @media (max-width: 768px) {
   .title {
     font-size: 2.5rem;
@@ -289,5 +453,23 @@
   .cardsGrid {
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 1rem;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .historyCards {
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .historyButton {
+    width: 100%;
+    font-size: 1rem;
+  }
+
+  .historyContainer {
+    padding: 1rem;
   }
 }

@@ -1,46 +1,114 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styles from './page.module.css'
 
 // Types pour les personnages
 interface Character {
   id: number
   name: string
-  rarity: 'common' | 'rare' | 'epic' | 'legendary'
+  rarity: 'C' | 'R' | 'SR' | 'SSR' | 'UR' | 'LR'
   image: string
 }
 
 // Base de données des personnages
 const characters: Character[] = [
-  { id: 1, name: 'Guerrier', rarity: 'common', image: '/cards/warrior.png' },
-  { id: 2, name: 'Mage', rarity: 'common', image: '/cards/mage.png' },
-  { id: 3, name: 'Archer', rarity: 'rare', image: '/cards/archer.png' },
-  { id: 4, name: 'Paladin', rarity: 'rare', image: '/cards/paladin.png' },
-  { id: 5, name: 'Assassin', rarity: 'epic', image: '/cards/assassin.png' },
-  { id: 6, name: 'Druide', rarity: 'epic', image: '/cards/druid.png' },
-  { id: 7, name: 'Dragon Knight', rarity: 'legendary', image: '/cards/dragon.png' },
-  { id: 8, name: 'Phoenix', rarity: 'legendary', image: '/cards/phoenix.png' },
+  { id: 1, name: 'Guerrier', rarity: 'C', image: '/cards/warrior.png' },
+  { id: 2, name: 'Mage', rarity: 'C', image: '/cards/mage.png' },
+  { id: 3, name: 'Archer', rarity: 'R', image: '/cards/archer.png' },
+  { id: 4, name: 'Paladin', rarity: 'R', image: '/cards/paladin.png' },
+  { id: 5, name: 'Voleur', rarity: 'R', image: '/cards/thief.png' },
+  { id: 6, name: 'Chevalier Noir', rarity: 'SR', image: '/cards/dark-knight.png' },
+  { id: 7, name: 'Druide', rarity: 'SR', image: '/cards/druid.png' },
+  { id: 8, name: 'Assassin', rarity: 'SSR', image: '/cards/assassin.png' },
+  { id: 9, name: 'Sage', rarity: 'SSR', image: '/cards/sage.png' },
+  { id: 10, name: 'Dragon Knight', rarity: 'UR', image: '/cards/dragon.png' },
+  { id: 11, name: 'Phoenix', rarity: 'LR', image: '/cards/phoenix.png' },
 ]
 
-// Probabilités d'obtention par rareté
+// Probabilités d'obtention par rareté (SÉVÈRE)
 const rarityChances = {
-  common: 0.60,    // 60%
-  rare: 0.30,      // 30%
-  epic: 0.09,      // 9%
-  legendary: 0.01  // 1%
+  C: 0.70,     // 70%
+  R: 0.20,     // 20%
+  SR: 0.07,    // 7%
+  SSR: 0.02,   // 2%
+  UR: 0.008,   // 0.8%
+  LR: 0.002    // 0.2%
+}
+
+interface HistoryEntry {
+  _id: string
+  userIp: string
+  characters: Character[]
+  pullCount: number
+  timestamp: string
+}
+
+interface Stats {
+  totalPulls: number
+  totalSessions: number
+  rarityCount: {
+    C: number
+    R: number
+    SR: number
+    SSR: number
+    UR: number
+    LR: number
+  }
 }
 
 export default function Home() {
   const [pulledCharacters, setPulledCharacters] = useState<Character[]>([])
   const [isAnimating, setIsAnimating] = useState(false)
   const [totalPulls, setTotalPulls] = useState(0)
+  const [history, setHistory] = useState<HistoryEntry[]>([])
+  const [stats, setStats] = useState<Stats | null>(null)
+  const [showHistory, setShowHistory] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   // Fonction pour tirer un personnage aléatoire basé sur les probabilités
+  // Charger l'historique au montage du composant
+  useEffect(() => {
+    loadHistory()
+  }, [])
+
+  const loadHistory = async () => {
+    try {
+      const response = await fetch('/api/history/get')
+      const data = await response.json()
+      
+      if (data.success) {
+        setHistory(data.history)
+        setStats(data.stats)
+        setTotalPulls(data.stats.totalPulls)
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement de l\'historique:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const saveToHistory = async (characters: Character[], pullCount: number) => {
+    try {
+      await fetch('/api/history/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ characters, pullCount }),
+      })
+      // Recharger l'historique après sauvegarde
+      loadHistory()
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde:', error)
+    }
+  }
+
   const pullCharacter = (): Character => {
     const random = Math.random()
     let cumulativeProbability = 0
-    let selectedRarity: Character['rarity'] = 'common'
+    let selectedRarity: Character['rarity'] = 'C'
 
     for (const [rarity, chance] of Object.entries(rarityChances)) {
       cumulativeProbability += chance
@@ -68,6 +136,9 @@ export default function Home() {
     setPulledCharacters(newCharacters)
     setTotalPulls(prev => prev + count)
 
+    // Sauvegarder dans l'historique
+    saveToHistory(newCharacters, count)
+
     // Animation terminée après 2 secondes
     setTimeout(() => {
       setIsAnimating(false)
@@ -76,10 +147,25 @@ export default function Home() {
 
   const getRarityColor = (rarity: string) => {
     switch (rarity) {
-      case 'legendary': return '#fbbf24'
-      case 'epic': return '#a855f7'
-      case 'rare': return '#3b82f6'
+      case 'LR': return '#ff0000'    // Rouge éclatant
+      case 'UR': return '#fbbf24'    // Or
+      case 'SSR': return '#a855f7'   // Violet
+      case 'SR': return '#3b82f6'    // Bleu
+      case 'R': return '#10b981'     // Vert
+      case 'C': return '#9ca3af'     // Gris
       default: return '#9ca3af'
+    }
+  }
+
+  const getRarityLabel = (rarity: string) => {
+    switch (rarity) {
+      case 'LR': return 'Legendary Rare'
+      case 'UR': return 'Ultra Rare'
+      case 'SSR': return 'Super Super Rare'
+      case 'SR': return 'Super Rare'
+      case 'R': return 'Rare'
+      case 'C': return 'Common'
+      default: return rarity
     }
   }
 
@@ -97,8 +183,24 @@ export default function Home() {
             <span className={styles.statValue}>{totalPulls}</span>
           </div>
           <div className={styles.statCard}>
-            <span className={styles.statLabel}>Dernière Session</span>
-            <span className={styles.statValue}>{pulledCharacters.length}</span>
+            <span className={styles.statLabel}>Sessions</span>
+            <span className={styles.statValue}>{stats?.totalSessions || 0}</span>
+          </div>
+          <div className={styles.statCard}>
+            <span className={styles.statLabel}>� LR</span>
+            <span className={styles.statValue}>{stats?.rarityCount.LR || 0}</span>
+          </div>
+          <div className={styles.statCard}>
+            <span className={styles.statLabel}>🟡 UR</span>
+            <span className={styles.statValue}>{stats?.rarityCount.UR || 0}</span>
+          </div>
+          <div className={styles.statCard}>
+            <span className={styles.statLabel}>🟣 SSR</span>
+            <span className={styles.statValue}>{stats?.rarityCount.SSR || 0}</span>
+          </div>
+          <div className={styles.statCard}>
+            <span className={styles.statLabel}>🔵 SR</span>
+            <span className={styles.statValue}>{stats?.rarityCount.SR || 0}</span>
           </div>
         </div>
 
@@ -159,7 +261,7 @@ export default function Home() {
                       className={styles.cardRarity}
                       style={{ color: getRarityColor(character.rarity) }}
                     >
-                      {character.rarity.toUpperCase()}
+                      {character.rarity} - {getRarityLabel(character.rarity)}
                     </span>
                   </div>
                 </div>
@@ -174,24 +276,90 @@ export default function Home() {
           </div>
         )}
 
+        <div className={styles.historySection}>
+          <button 
+            className={styles.historyButton}
+            onClick={() => setShowHistory(!showHistory)}
+          >
+            📜 {showHistory ? 'Masquer' : 'Afficher'} l'historique complet
+          </button>
+
+          {showHistory && (
+            <div className={styles.historyContainer}>
+              {isLoading ? (
+                <p className={styles.historyLoading}>Chargement...</p>
+              ) : history.length === 0 ? (
+                <p className={styles.historyEmpty}>Aucun historique pour le moment. Commencez à invoquer !</p>
+              ) : (
+                <div className={styles.historyList}>
+                  {history.map((entry) => (
+                    <div key={entry._id} className={styles.historyItem}>
+                      <div className={styles.historyHeader}>
+                        <span className={styles.historyDate}>
+                          {new Date(entry.timestamp).toLocaleDateString('fr-FR', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </span>
+                        <span className={styles.historyCount}>
+                          {entry.pullCount} invocation{entry.pullCount > 1 ? 's' : ''}
+                        </span>
+                      </div>
+                      <div className={styles.historyCards}>
+                        {entry.characters.map((char, idx) => (
+                          <div 
+                            key={`${entry._id}-${idx}`}
+                            className={styles.historyCard}
+                            style={{ borderColor: getRarityColor(char.rarity) }}
+                          >
+                            <img 
+                              src={char.image} 
+                              alt={char.name}
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = `https://via.placeholder.com/80x120/1e293b/ffffff?text=${char.name}`
+                              }}
+                            />
+                            <span className={styles.historyCardName}>{char.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
         <div className={styles.probabilityInfo}>
           <h3>📊 Taux d'obtention</h3>
           <div className={styles.probabilityList}>
             <div className={styles.probabilityItem}>
-              <span style={{ color: '#9ca3af' }}>⚪ Commun</span>
-              <span>60%</span>
+              <span style={{ color: '#9ca3af' }}>⚪ C - Common</span>
+              <span>70%</span>
             </div>
             <div className={styles.probabilityItem}>
-              <span style={{ color: '#3b82f6' }}>🔵 Rare</span>
-              <span>30%</span>
+              <span style={{ color: '#10b981' }}>🟢 R - Rare</span>
+              <span>20%</span>
             </div>
             <div className={styles.probabilityItem}>
-              <span style={{ color: '#a855f7' }}>🟣 Épique</span>
-              <span>9%</span>
+              <span style={{ color: '#3b82f6' }}>🔵 SR - Super Rare</span>
+              <span>7%</span>
             </div>
             <div className={styles.probabilityItem}>
-              <span style={{ color: '#fbbf24' }}>🟡 Légendaire</span>
-              <span>1%</span>
+              <span style={{ color: '#a855f7' }}>🟣 SSR - Super Super Rare</span>
+              <span>2%</span>
+            </div>
+            <div className={styles.probabilityItem}>
+              <span style={{ color: '#fbbf24' }}>🟡 UR - Ultra Rare</span>
+              <span>0.8%</span>
+            </div>
+            <div className={styles.probabilityItem}>
+              <span style={{ color: '#ff0000' }}>🔴 LR - Legendary Rare</span>
+              <span>0.2%</span>
             </div>
           </div>
         </div>
