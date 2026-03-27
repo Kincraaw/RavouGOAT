@@ -24,7 +24,7 @@ Application web Next.js pour invoquer des personnages avec un système de gacha.
 
 1. Créer un fichier `.env.local` à la racine avec votre URI MongoDB :
 ```
-MONGODB_URI=mongodb+srv://user:password@cluster.mongodb.net/it8_card
+MONGODB_URI=lienmongocluster
 ```
 
 2. Installer les dépendances :
