@@ -60,6 +60,7 @@ interface Stats {
 export default function Home() {
   const [pulledCharacters, setPulledCharacters] = useState<Character[]>([])
   const [isAnimating, setIsAnimating] = useState(false)
+  const [showReveal, setShowReveal] = useState(false)
   const [totalPulls, setTotalPulls] = useState(0)
   const [history, setHistory] = useState<HistoryEntry[]>([])
   const [stats, setStats] = useState<Stats | null>(null)
@@ -127,22 +128,27 @@ export default function Home() {
     if (isAnimating) return
 
     setIsAnimating(true)
+    setShowReveal(false)
+    setPulledCharacters([])
     const newCharacters: Character[] = []
 
     for (let i = 0; i < count; i++) {
       newCharacters.push(pullCharacter())
     }
 
-    setPulledCharacters(newCharacters)
-    setTotalPulls(prev => prev + count)
-
-    // Sauvegarder dans l'historique
-    saveToHistory(newCharacters, count)
-
-    // Animation terminée après 2 secondes
+    // Animation de révélation après 1.5 secondes
     setTimeout(() => {
+      setShowReveal(true)
+    }, 1500)
+
+    // Afficher les cartes après 2.2 secondes
+    setTimeout(() => {
+      setPulledCharacters(newCharacters)
+      setTotalPulls(prev => prev + count)
+      saveToHistory(newCharacters, count)
       setIsAnimating(false)
-    }, 2000)
+      setShowReveal(false)
+    }, 2200)
   }
 
   const getRarityColor = (rarity: string) => {
@@ -227,9 +233,28 @@ export default function Home() {
         </div>
 
         {isAnimating && (
-          <div className={styles.loading}>
-            <div className={styles.spinner}></div>
-            <p>Invocation en cours...</p>
+          <div className={styles.loadingOverlay}>
+            <div className={styles.loadingContent}>
+              <div className={styles.summonCircle}>
+                <div className={styles.innerCircle}></div>
+                <div className={styles.outerCircle}></div>
+              </div>
+              <div className={styles.particles}>
+                {[...Array(20)].map((_, i) => (
+                  <div key={i} className={styles.particle} style={{
+                    '--angle': `${(360 / 20) * i}deg`,
+                    '--delay': `${i * 0.05}s`
+                  } as React.CSSProperties}></div>
+                ))}
+              </div>
+              <h2 className={styles.summonText}>Invocation en cours...</h2>
+              <div className={styles.energyBar}>
+                <div className={styles.energyFill}></div>
+              </div>
+            </div>
+            {showReveal && (
+              <div className={styles.revealFlash}></div>
+            )}
           </div>
         )}
 
