@@ -13,17 +13,18 @@ interface Character {
 
 // Base de données des personnages
 const characters: Character[] = [
-  { id: 1, name: 'Guerrier', rarity: 'C', image: '/cards/warrior.png' },
-  { id: 2, name: 'Mage', rarity: 'C', image: '/cards/mage.png' },
-  { id: 3, name: 'Archer', rarity: 'R', image: '/cards/archer.png' },
-  { id: 4, name: 'Paladin', rarity: 'R', image: '/cards/paladin.png' },
-  { id: 5, name: 'Voleur', rarity: 'R', image: '/cards/thief.png' },
-  { id: 6, name: 'Chevalier Noir', rarity: 'SR', image: '/cards/dark-knight.png' },
-  { id: 7, name: 'Druide', rarity: 'SR', image: '/cards/druid.png' },
-  { id: 8, name: 'Assassin', rarity: 'SSR', image: '/cards/assassin.png' },
-  { id: 9, name: 'Sage', rarity: 'SSR', image: '/cards/sage.png' },
+  { id: 1, name: 'Ravoulhier', rarity: 'C', image: '/cards/Ravoulhier.png' },
+  { id: 2, name: 'Ravoumage', rarity: 'C', image: '/cards/Ravoumage.png' },
+  { id: 3, name: 'Ravoutir', rarity: 'R', image: '/cards/Ravoutir.png' },
+  { id: 4, name: 'Ravousteak', rarity: 'R', image: '/cards/Ravousteak.png' },
+  { id: 5, name: 'Le Rat', rarity: 'R', image: '/cards/Rat.jpeg' },
+  { id: 6, name: 'Ravolie', rarity: 'SR', image: '/cards/Ravolie.png' },
+  { id: 7, name: 'Ravourabre', rarity: 'SR', image: '/cards/Ravourabre.png' },
+  { id: 8, name: 'Ravassassin', rarity: 'SSR', image: '/cards/Ravassassin.png' },
+  { id: 9, name: 'Jewy', rarity: 'SSR', image: '/cards/Jewy.png' },
   { id: 10, name: 'Dragon Knight', rarity: 'UR', image: '/cards/dragon.png' },
-  { id: 11, name: 'Phoenix', rarity: 'LR', image: '/cards/phoenix.png' },
+  { id: 11, name: 'Ravoumaid', rarity: 'LR', image: '/cards/Ravoumaid.png' },
+  { id: 12, name: 'Employé', rarity: 'R', image: '/cards/Mcdonald.jpeg' },
 ]
 
 // Probabilités d'obtention par rareté (SÉVÈRE)
